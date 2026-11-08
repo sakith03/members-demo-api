@@ -1,0 +1,23 @@
+apiVersion: openchoreo.dev/v1alpha1
+kind: Project
+metadata:
+  name: export-demo
+  namespace: default
+  annotations:
+    openchoreo.dev/display-name: Export Demo
+spec:
+  deploymentPipelineRef:
+    name: default
+  type:
+    kind: ClusterProjectType
+    name: default
+---
+apiVersion: openchoreo.dev/v1alpha1
+kind: ProjectReleaseBinding
+metadata:
+  name: export-demo-development
+  namespace: default
+spec:
+  owner:
+    projectName: export-demo
+  environment: development

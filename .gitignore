@@ -1,0 +1,5 @@
+/members-api
+/bin/
+/.DS_Store
+/coverage.out
+/openchoreo/generated-*.yaml

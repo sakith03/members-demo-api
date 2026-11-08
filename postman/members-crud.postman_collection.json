@@ -1,0 +1,306 @@
+{
+  "info": {
+    "_postman_id": "ad73e9c7-1a40-4093-93a7-e138499f6c00",
+    "name": "OpenChoreo - Members CRUD Demo",
+    "description": "Run requests 01 through 09 in order. Select Local or OpenChoreo environment and set base_url without a trailing slash. Request 03 saves member_id for subsequent requests. PUT replaces the member fields; DELETE returns 204 with no body. In-memory data resets when the process restarts; use one replica.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "noauth"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "member_id",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "01 - Health check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/healthz"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"Service is healthy\", function () { pm.expect(pm.response.json().status).to.eql(\"ok\"); });"
+            ]
+          }
+        }
+      ],
+      "response": []
+    },
+    {
+      "name": "02 - Show all members",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/members"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"List and count agree\", function () { const body = pm.response.json(); pm.expect(body.data).to.be.an(\"array\"); pm.expect(body.count).to.eql(body.data.length); });"
+            ]
+          }
+        }
+      ],
+      "response": []
+    },
+    {
+      "name": "03 - Add member",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/members",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Charlie Fernando\",\n  \"email\": \"charlie@example.com\",\n  \"role\": \"member\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.collectionVariables.unset(\"member_id\");"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 201\", function () { pm.response.to.have.status(201); });",
+              "if (pm.response.code === 201) { pm.collectionVariables.set(\"member_id\", String(pm.response.json().data.id)); }",
+              "pm.test(\"Member created\", function () { const member = pm.response.json().data; pm.expect(member.id).to.be.a(\"number\"); pm.expect(member.name).to.eql(\"Charlie Fernando\"); pm.expect(member.email).to.eql(\"charlie@example.com\"); pm.expect(member.role).to.eql(\"member\"); });"
+            ]
+          }
+        }
+      ],
+      "response": []
+    },
+    {
+      "name": "04 - Show created member",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/members/{{member_id}}"
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "if (!pm.collectionVariables.get(\"member_id\")) { throw new Error(\"Send 03 - Add member first to capture member_id.\"); }"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"Correct member returned\", function () { const member = pm.response.json().data; pm.expect(String(member.id)).to.eql(pm.collectionVariables.get(\"member_id\")); pm.expect(member.email).to.eql(\"charlie@example.com\"); });"
+            ]
+          }
+        }
+      ],
+      "response": []
+    },
+    {
+      "name": "05 - Edit member",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/members/{{member_id}}",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Charlie Fernando Updated\",\n  \"email\": \"charlie.updated@example.com\",\n  \"role\": \"admin\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "if (!pm.collectionVariables.get(\"member_id\")) { throw new Error(\"Send 03 - Add member first to capture member_id.\"); }"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"Member edited\", function () { const member = pm.response.json().data; pm.expect(String(member.id)).to.eql(pm.collectionVariables.get(\"member_id\")); pm.expect(member.name).to.eql(\"Charlie Fernando Updated\"); pm.expect(member.email).to.eql(\"charlie.updated@example.com\"); pm.expect(member.role).to.eql(\"admin\"); });"
+            ]
+          }
+        }
+      ],
+      "response": []
+    },
+    {
+      "name": "06 - Verify edited member",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/members/{{member_id}}"
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "if (!pm.collectionVariables.get(\"member_id\")) { throw new Error(\"Send 03 - Add member first to capture member_id.\"); }"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"Edit was saved\", function () { const member = pm.response.json().data; pm.expect(String(member.id)).to.eql(pm.collectionVariables.get(\"member_id\")); pm.expect(member.name).to.eql(\"Charlie Fernando Updated\"); pm.expect(member.email).to.eql(\"charlie.updated@example.com\"); pm.expect(member.role).to.eql(\"admin\"); });"
+            ]
+          }
+        }
+      ],
+      "response": []
+    },
+    {
+      "name": "07 - Delete member",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": "{{base_url}}/members/{{member_id}}"
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "if (!pm.collectionVariables.get(\"member_id\")) { throw new Error(\"Send 03 - Add member first to capture member_id.\"); }"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 204\", function () { pm.response.to.have.status(204); });",
+              "pm.test(\"Delete has no response body\", function () { pm.expect(pm.response.text()).to.eql(\"\"); });"
+            ]
+          }
+        }
+      ],
+      "response": []
+    },
+    {
+      "name": "08 - Verify deleted member returns 404",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/members/{{member_id}}"
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "if (!pm.collectionVariables.get(\"member_id\")) { throw new Error(\"Send 03 - Add member first to capture member_id.\"); }"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 404\", function () { pm.response.to.have.status(404); });",
+              "pm.test(\"Member is gone\", function () { pm.expect(pm.response.json().error).to.eql(\"member not found\"); });"
+            ]
+          }
+        }
+      ],
+      "response": []
+    },
+    {
+      "name": "09 - Show members after delete",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/members"
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "if (!pm.collectionVariables.get(\"member_id\")) { throw new Error(\"Send 03 - Add member first to capture member_id.\"); }"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"Deleted member is absent\", function () { const body = pm.response.json(); pm.expect(body.count).to.eql(body.data.length); const id = Number(pm.collectionVariables.get(\"member_id\")); pm.expect(body.data.some(function (member) { return member.id === id; })).to.eql(false); });"
+            ]
+          }
+        }
+      ],
+      "response": []
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+# Source workload descriptor, read by the dockerfile-builder workflow.
+# This is NOT a Kubernetes Workload manifest; do not apply it with kubectl.
+apiVersion: openchoreo.dev/v1alpha1
+metadata:
+  name: members-api
+endpoints:
+  - name: http
+    displayName: Members REST API
+    port: 8080
+    type: HTTP
+    basePath: /
+    visibility:
+      - external
+    schemaFile: openapi.json

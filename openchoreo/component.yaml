@@ -1,0 +1,28 @@
+# Replace YOUR_USERNAME with the owner of the repository you push this folder to.
+# Assumes these files are at the repository root and the branch is main.
+apiVersion: openchoreo.dev/v1alpha1
+kind: Component
+metadata:
+  name: members-api
+  namespace: default
+  annotations:
+    openchoreo.dev/display-name: Members API
+spec:
+  owner:
+    projectName: export-demo
+  componentType:
+    kind: ClusterComponentType
+    name: deployment/service
+  autoDeploy: true
+  workflow:
+    kind: ClusterWorkflow
+    name: dockerfile-builder
+    parameters:
+      repository:
+        url: https://github.com/YOUR_USERNAME/members-demo-api
+        revision:
+          branch: main
+        appPath: .
+      docker:
+        context: .
+        filePath: ./Dockerfile
