@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#153d35">
+  <meta name="description" content="A simple workspace for managing your demo members.">
+  <title>Members · People workspace</title>
+  <script>
+    // Preserve OpenChoreo's gateway prefix, with or without a trailing slash.
+    const base = document.createElement("base");
+    base.href = location.pathname.replace(/\/index\.html$/, "").replace(/\/?$/, "/");
+    document.head.append(base);
+  </script>
+  <link rel="stylesheet" href="styles.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand"><span class="brand-mark" aria-hidden="true">m.</span> members<span class="brand-divider" aria-hidden="true"></span><span class="workspace-name">Demo workspace</span></div>
+    <span class="demo-label"><span class="dot" aria-hidden="true"></span> CRUD demo</span>
+  </header>
+
+  <main>
+    <div class="page-heading">
+      <div><p class="eyebrow">PEOPLE &amp; CONNECTIONS</p><h1>A place for everyone.</h1><p class="intro">Keep your members in one simple, shared workspace.</p></div>
+      <button id="add-member" class="button primary" type="button"><span aria-hidden="true">＋</span> Add member</button>
+    </div>
+
+    <section class="summary" aria-label="Member summary">
+      <div><span class="summary-label">Total members</span><strong id="total-count">—</strong><span class="summary-note">People in your workspace</span></div>
+      <div><span class="summary-label">Admins</span><strong id="admin-count">—</strong><span class="summary-note">Members with the admin role</span></div>
+      <div class="connection-summary"><span class="summary-label">API connection</span><strong id="connection-status" class="connection-status">Connecting…</strong><span class="summary-note">Live data from the members API</span></div>
+    </section>
+
+    <div id="notice" class="notice" role="status" aria-live="polite" hidden></div>
+
+    <section class="directory" aria-labelledby="directory-title">
+      <div class="directory-toolbar">
+        <div class="directory-heading"><h2 id="directory-title">Member directory</h2><span id="directory-count" class="count-badge">0</span></div>
+        <div class="directory-controls">
+          <label class="search"><span aria-hidden="true">⌕</span><input id="search" type="search" placeholder="Search name, email, or role" aria-label="Search members"></label>
+          <button id="refresh" class="button secondary" type="button">Refresh</button>
+        </div>
+      </div>
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th scope="col">Member</th><th scope="col">Email address</th><th scope="col">Role</th><th scope="col" class="actions-heading">Actions</th></tr></thead>
+          <tbody id="member-list"></tbody>
+        </table>
+      </div>
+      <div id="empty-state" class="empty-state" hidden><span class="empty-icon" aria-hidden="true">m.</span><h3 id="empty-title">No members yet</h3><p id="empty-description">Add your first member to get started.</p></div>
+      <div id="loading" class="loading" role="status">Loading your members…</div>
+      <div class="table-footer"><span id="results-count">Fetching members</span><span>Made for a simpler demo.</span></div>
+    </section>
+
+    <footer class="page-footer"><span class="dot" aria-hidden="true"></span>Demo data lives in memory and resets when the API restarts. Roles are display labels.</footer>
+  </main>
+
+  <dialog id="member-dialog" aria-labelledby="form-title">
+    <form id="member-form">
+      <div class="dialog-heading"><div><p class="eyebrow">YOUR WORKSPACE</p><h2 id="form-title">Add a member</h2></div><button class="icon-button" id="close-dialog" type="button" aria-label="Close dialog">×</button></div>
+      <p class="dialog-description">A few details to put a name to the face.</p>
+      <label class="field">Full name<input name="name" id="member-name" autocomplete="name" placeholder="e.g. Charlie Fernando" required></label>
+      <label class="field">Email address<input name="email" id="member-email" type="email" autocomplete="email" placeholder="charlie@example.com" required></label>
+      <label class="field">Role<input name="role" id="member-role" list="role-options" placeholder="member"><datalist id="role-options"><option value="member"><option value="admin"></datalist></label>
+      <p id="form-error" class="form-error" role="alert" hidden></p>
+      <div class="dialog-footer"><button id="cancel-dialog" class="button secondary" type="button">Cancel</button><button id="save-member" class="button primary" type="submit">Add member</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="delete-dialog" aria-labelledby="delete-title">
+    <form id="delete-form">
+      <p class="eyebrow">MEMBER DIRECTORY</p><h2 id="delete-title">Remove this member?</h2>
+      <p id="delete-description" class="dialog-description"></p>
+      <p id="delete-error" class="form-error" role="alert" hidden></p>
+      <div class="dialog-footer"><button id="cancel-delete" class="button secondary" type="button">Keep member</button><button id="confirm-delete" class="button danger" type="submit">Remove member</button></div>
+    </form>
+  </dialog>
+</body>
+</html>

@@ -9,6 +9,9 @@ Source builds still need access to the Go builder container image.
 
 ## Start locally
 
+For the separate web UI and its OpenChoreo component setup, see
+[`frontend/README.md`](frontend/README.md).
+
 Requires Go 1.22 or newer (the Dockerfile uses Go 1.27.3).
 
 ```sh
@@ -297,6 +300,7 @@ Its member role field is separate from OpenChoreo RBAC.
 - `workload.yaml`: OpenChoreo source workload descriptor, external HTTP port 8080.
 - `openapi.json`: endpoint specification and request/response schemas.
 - `openchoreo/`: project/development binding and source component manifests.
+- `frontend/`: separate web component with member search, add, edit, and remove.
 - `postman/`: prepared collection and local/deployed environments.
 
 Reference: [Postman import guide](https://learning.postman.com/docs/getting-started/importing-and-exporting/importing-data/),

@@ -1,0 +1,17 @@
+# Source descriptor read by dockerfile-builder; do not apply with kubectl.
+apiVersion: openchoreo.dev/v1alpha1
+metadata:
+  name: members-frontend
+endpoints:
+  - name: http
+    displayName: Members Web UI
+    port: 8080
+    type: HTTP
+    basePath: /
+    visibility:
+      - external
+configurations:
+  env:
+    - name: API_BASE_URL
+      # Both components must be in export-demo and the same environment.
+      value: http://members-api:8080

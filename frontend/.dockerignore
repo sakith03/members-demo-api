@@ -1,0 +1,6 @@
+*
+!go.mod
+!main.go
+!static/
+!static/**
+!Dockerfile
